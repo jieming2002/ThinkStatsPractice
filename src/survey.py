@@ -149,16 +149,17 @@ class Pregnancies(Table):
             sequence of (name, start, end, type) tuples
         """
         return [
-            ('caseid', 1, 12, int),
+            ('caseid', 1, 12, int), # 从第 1 列到第 12 列是 caseid 字段，且类型为整数
+            # (field, start, end, 转换函数) 可以用内置的函数，比如 int 和 float 也可使用用户自定义的函数
             ('nbrnaliv', 22, 22, int),
             ('babysex', 56, 56, int),
             ('birthwgt_lb', 57, 58, int),
             ('birthwgt_oz', 59, 60, int),
-            ('prglength', 275, 276, int),
-            ('outcome', 277, 277, int),
-            ('birthord', 278, 279, int),
+            ('prglength', 275, 276, int),   # 怀孕周期，单位是周
+            ('outcome', 277, 277, int),     #怀孕结果的整数代码。代码 1 表示活婴。
+            ('birthord', 278, 279, int), # 正常出生的婴儿的顺序。例如，第一胎婴儿的编号是1 。
             ('agepreg', 284, 287, int),
-            ('finalwgt', 423, 440, float),
+            ('finalwgt', 423, 440, float), #被调查者的统计权重。
             ]
 
     def Recode(self):
