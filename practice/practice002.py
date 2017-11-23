@@ -21,7 +21,7 @@ __author__ = 'Skye 2017-11-20'
     直方图可以非常直观地展现数据的：众数、形状、异常值。
     直方图中某些明显差异是由样本数量造成的。可以用 PMF 来解决这个问题。
 PMF（Probability Mass Function，概率质量函数）：归一化之后的直方图
-    把频数转换成概率，这称为归一化。
+    把频数/n 转换成概率，这称为归一化。
 """
 import thinkstats
 import math
@@ -42,7 +42,7 @@ def Process(table, name):
     # 计算切尾均值：根据序列
     table.trim = thinkstats.TrimmedMean(table.lengths)
 
-    table.hist = Pmf.MakePmfFromList(table.lengths, name=name)
+    table.hist = Pmf.MakeHistFromList(table.lengths, name=name)
     table.pmf = Pmf.MakePmfFromList(table.lengths)
 
 def PoolRecords(*tables):
@@ -61,7 +61,7 @@ def MakeTables(data_dir):
     table, firsts, others = practice001.MakeTables(data_dir)
     pool = PoolRecords(firsts, others)
 
-    Process(pool, '活婴')
+    Process(pool, '所有活婴')
     Process(firsts, '第一胎')
     Process(others, '其他胎')
 
@@ -89,17 +89,17 @@ def Summarize(pool, firsts, others):
     print('第一胎：', firsts.trim)
     print('其他：', others.trim)
 
-    # # 获取妊娠期序列
-    # live_lengths = pool.hist.GetDict().items()
-    # # live_lengths.sort()
-    # sorted(live_lengths) #给字典排序，按值排序
-    # print('最短长度：')
-    # for weeks, count in live_lengths[:10]: #只遍历前面 10 个元素
-    #     print(weeks, count)
-    #
-    # print('最长长度：')
-    # for weeks, count in live_lengths[-10:]:  #只遍历最后 10 个元素
-    #     print(weeks, count)
+    # 获取妊娠期序列
+    live_lengths = pool.hist.GetDict().items()
+    live_lengths = list(live_lengths)
+    live_lengths.sort()
+    print('最短长度：')
+    for weeks, count in live_lengths[:9]: #只遍历前面 10 个元素
+        print(weeks, count)
+
+    print('最长长度：')
+    for weeks, count in live_lengths[-9:]:  #只遍历最后 10 个元素
+        print(weeks, count)
 
 def MakeFigures(firsts, others):
     ''' 为妊娠期绘制直方图 和 PMF 图 '''
