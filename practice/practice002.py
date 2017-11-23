@@ -43,7 +43,7 @@ def Process(table, name):
     table.trim = thinkstats.TrimmedMean(table.lengths)
 
     table.hist = Pmf.MakeHistFromList(table.lengths, name=name)
-    table.pmf = Pmf.MakePmfFromList(table.lengths)
+    table.pmf = Pmf.MakePmfFromList(table.lengths, name=name)
 
 def PoolRecords(*tables):
     ''' 合并数据表 '''
@@ -63,7 +63,7 @@ def MakeTables(data_dir):
 
     Process(pool, '所有活婴')
     Process(firsts, '第一胎')
-    Process(others, '其他胎')
+    Process(others, '其他')
 
     return pool, firsts, others
 
