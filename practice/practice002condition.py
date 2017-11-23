@@ -1,69 +1,49 @@
 __author__ = 'Skye 2017-11-23'
 # coding=utf-8
 
-import descriptive
+from src import descriptive
 
-def ProbRange(pmf, low, high):
-    ''' 计算执行区间的总概率，包括两端
+def RemoveRange(pmf, low, high):
+    ''' 将指定区间的值从分布中删除，包括两端。然后重新将数据归一化。
     :param pmf: Pmf 对象
     :param low: 区间下限
     :param high: 区间上限
-    :return: 概率，浮点数
     '''
-    total = 0.0
-    for week in range(low, high+1):
-        total += pmf.Prob(week)
-    return total
+    print('RemoveRange 前 total = ', pmf.Total())
 
-def ProbEarly(pmf):
-    ''' 计算提前出生的概率 小于等于 37 周
-    :param pmf: Pmf 对象
-    :return:浮点数，概率
-    '''
-    return ProbRange(pmf, 0, 37)
+    for week in range(low, high):
+        prob = pmf.Prob(week)
+        if prob > 0:
+            pmf.Remove(week)
 
-def ProbOnTime(pmf):
-    ''' 计算 38 周到 40 周出生的概率
-    :param pmf: Pmf object
-    :return: float probability
-    '''
-    return ProbRange(pmf, 38, 40)
+    print('RemoveRange 后 total = ', pmf.Total())
+    pmf.Normalize()
+    print('重新归一化后 total = ', pmf.Total())
 
-def ProbLate(pmf):
-    ''' Computes the probability of a birth in Week 41 or later.
-    :param pmf: Pmf object
-    :return: float probability
-    '''
-    return ProbRange(pmf, 41, 50)
-
-def ComputeRelativeRisk(first_pmf, other_pmf):
-    ''' Computes relative risks for two PMFs.
-    :param first_pmf:  Pmf object
-    :param other_pmf: Pmf object
+def ComputeConditionalProbability(pmf, week):
+    ''' 计算条件概率
+    :param pmf: Pmf 对象，含有计算好的概率
+    :param week: 当前是第几周
     :return:
     '''
-    print( '风险计算:')
-    funcs = [ProbEarly, ProbOnTime, ProbLate]
-    risks = {}
-    for func in funcs:
-        for pmf in [first_pmf, other_pmf]:
-            prob = func(pmf)
-            risks[func.__name__, pmf.name] = prob
-            print(func.__name__, pmf.name, prob)
-
-    print()
-    print('风险比例 (第一胎 / 其他):')
-    for func in funcs:
-        try:
-            ratio = (risks[func.__name__, 'first babies'] /
-                     risks[func.__name__, 'others'])
-            print(func.__name__, ratio)
-        except ZeroDivisionError:
-            pass
+    RemoveRange(pmf, 0, week - 1)
+    return pmf.Prob(week)
 
 def main():
     pool, firsts, others = descriptive.MakeTables('../data/')
-    ComputeRelativeRisk(firsts.pmf, others.pmf)
+    week = 39
+    # 计算宝宝在第 39 周出生的概率（ 假设宝宝没有在 39 周前出生）
+    # 第一胎
+    prob = ComputeConditionalProbability(firsts.pmf, week)
+    print('第一胎：', prob)
+
+    # 其他
+    prob = ComputeConditionalProbability(others.pmf, week)
+    print('其他：', prob)
+
+    # 不知道第几胎
+    prob = ComputeConditionalProbability(pool.pmf, week)
+    print('不知道第几胎：', prob)
 
 if __name__ == "__main__":
     main()
